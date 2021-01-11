@@ -1,13 +1,12 @@
-package com.tyfann.springcloud.controller;
+package com.tyfann.springcloud;
 
-import com.tyfann.springcloud.entities.IUserService;
-import com.tyfann.springcloud.entities.User;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -17,18 +16,16 @@ import java.util.List;
 
 /**
  * @author tyfann
- * @date 2021/1/11 6:22 下午
+ * @date 2021/1/11 9:26 下午
  */
-@RestController
-public class ConsumerController {
+public class CuratorGetter {
 
     CuratorFramework client;
     final String IP = "192.168.1.106:2181";
-    final String Path = "/services";
+    final String Path = "/services/rpc-payment-service";
 
-    @GetMapping(value = "/consumer/payment/zk")
-    public User getUserInfoById() throws Exception {
-        //重试策略，每隔1000ms重试一次，总共重试10次
+    @Before
+    public void before() {
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 10);
         client = CuratorFrameworkFactory.builder()
                 .connectString(IP)   //zookeeper服务器地址
@@ -38,21 +35,16 @@ public class ConsumerController {
                 .build();
 
         client.start();
-
-        final String serviceName = "rpc-payment-service";
-        String serviceAddress = discover(serviceName);
-        String ip = serviceAddress.split("[:]")[0];
-        String port = serviceAddress.split("[:]")[1];
-
-        IUserService service = ConsumerStub.getStub();
-        User user = service.findUserById(123);
-        System.out.println(user);
-        return user;
     }
 
-    public String discover(String serviceName) throws Exception {
-        String servicePath = Path+"/"+serviceName;
-        List<String> childrenNames = client.getChildren().forPath(servicePath);
+    @After
+    public void after() {
+        client.close();
+    }
+
+    @Test
+    public void get1() throws Exception {
+        List<String> childrenNames = client.getChildren().forPath(Path);
 
         Base64.Decoder decoder = Base64.getDecoder();
         Iterator<String> it = childrenNames.iterator();
@@ -62,7 +54,10 @@ public class ConsumerController {
             System.out.println(new String(decoder.decode(s),StandardCharsets.UTF_8));
             nodeNames.add(new String(decoder.decode(s),StandardCharsets.UTF_8));
         }
-
-        return nodeNames.get(0);
+        String serviceAddress = nodeNames.get(0);
+        String ip = serviceAddress.split("[:]")[0];
+        String port = serviceAddress.split("[:]")[1];
+        System.out.println("服务ip是：  "+ip);
+        System.out.println("服务端口是：  "+port);
     }
 }

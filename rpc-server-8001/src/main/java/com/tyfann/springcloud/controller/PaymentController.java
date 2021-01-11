@@ -36,7 +36,7 @@ public class PaymentController {
 
 //    @GetMapping(value = "/payment/zk")
     public void getUserById() throws Exception{
-        ServerSocket server = new ServerSocket(2181);
+        ServerSocket server = new ServerSocket(800);
         while (running) {
             Socket client = server.accept();
             process(client);

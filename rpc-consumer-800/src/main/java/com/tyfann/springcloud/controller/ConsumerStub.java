@@ -24,7 +24,7 @@ public class ConsumerStub {
         InvocationHandler handler = new InvocationHandler() {
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                Socket socket = new Socket("192.168.1.106",2181);
+                Socket socket = new Socket("127.0.0.1",800);
 
                 ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 
