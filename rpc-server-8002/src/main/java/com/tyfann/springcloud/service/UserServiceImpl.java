@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements IUserService {
     @Override
-    public User findUserById(Integer id) {
-        return new User(id,"Finny");
+    public String findUserById(Integer id) {
+        return "Finny";
     }
 }

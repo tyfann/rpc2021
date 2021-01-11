@@ -12,6 +12,7 @@
         <module>common-variable</module>
         <module>rpc-consumer-800</module>
         <module>rpc-server-8002</module>
+        <module>rpc01</module>
     </modules>
     <packaging>pom</packaging>
 

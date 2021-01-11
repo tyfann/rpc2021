@@ -28,15 +28,13 @@ import java.util.UUID;
 public class PaymentController {
     private static boolean running = true;
 
-    @Value("${server.port}")
-    private String serverPort;
 
     @Resource
     private IUserService service;
 
-//    @GetMapping(value = "/payment/zk")
+
     public void getUserById() throws Exception{
-        ServerSocket server = new ServerSocket(800);
+        ServerSocket server = new ServerSocket(8001);
         while (running) {
             Socket client = server.accept();
             process(client);

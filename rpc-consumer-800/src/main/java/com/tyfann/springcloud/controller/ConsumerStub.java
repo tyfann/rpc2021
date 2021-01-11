@@ -20,11 +20,11 @@ public class ConsumerStub {
 
     public static final String INVOKE_URL = "http://rpc-server-payment";
 
-    static IUserService getStub() {
+    static IUserService getStub(String ip, int port) {
         InvocationHandler handler = new InvocationHandler() {
             @Override
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                Socket socket = new Socket("127.0.0.1",800);
+            public String invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                Socket socket = new Socket(ip,port);
 
                 ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 
@@ -36,11 +36,12 @@ public class ConsumerStub {
                 oos.flush();
 
                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-                User user = (User) ois.readObject();
+                String userName = (String) ois.readObject();
+                System.out.println("Yes!!!!");
 
                 oos.close();
                 socket.close();
-                return user;
+                return userName;
             }
         };
         Object o = Proxy.newProxyInstance(IUserService.class.getClassLoader(), new Class[]{IUserService.class},handler);

@@ -5,5 +5,5 @@ package com.tyfann.springcloud.entities;
  * @date 2021/1/10 6:49 下午
  */
 public interface IUserService {
-    public User findUserById(Integer id);
+    public String findUserById(Integer id);
 }
