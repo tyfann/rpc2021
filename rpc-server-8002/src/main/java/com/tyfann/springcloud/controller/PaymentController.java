@@ -1,10 +1,12 @@
 package com.tyfann.springcloud.controller;
 
 import com.tyfann.springcloud.entities.IUserService;
-import com.tyfann.springcloud.entities.IUserServiceImpl;
 import com.tyfann.springcloud.entities.User;
+import com.tyfann.springcloud.service.UserServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -13,6 +15,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.UUID;
 
 /**
  * @author tyfann
@@ -25,7 +28,10 @@ public class PaymentController {
     @Resource
     private IUserService service;
 
-    @GetMapping(value = "/payment/zk")
+    @Value("${server.port}")
+    private String serverPort;
+
+//    @RequestMapping(value = "/payment/zk")
     public void getUserById() throws Exception{
         ServerSocket server = new ServerSocket(8002);
         while (running) {
@@ -36,6 +42,11 @@ public class PaymentController {
         server.close();
     }
 
+//    @RequestMapping(value = "/payment/zk")
+//    public String paymentzk() {
+//        return "springcloud with zookeeper: "+ serverPort+"\t"+ UUID.randomUUID().toString();
+//    }
+
     private void process(Socket socket) throws Exception{
         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
         ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
@@ -44,7 +55,7 @@ public class PaymentController {
         Class[] parameterTypes = (Class[]) ois.readObject();
         Object[] args = (Object[]) ois.readObject();
 
-        IUserService service = new IUserServiceImpl();
+        IUserService service = new UserServiceImpl();
         Method method = service.getClass().getMethod(methodName, parameterTypes);
         User user = (User) method.invoke(service, args);
 
