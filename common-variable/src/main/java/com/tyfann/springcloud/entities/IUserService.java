@@ -6,4 +6,6 @@ package com.tyfann.springcloud.entities;
  */
 public interface IUserService {
     public String findUserById(Integer id);
+
+    public User getUserById(Integer id);
 }

@@ -8,11 +8,9 @@
     <artifactId>rpc2021</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>rpc-server-8001</module>
         <module>common-variable</module>
         <module>rpc-consumer-800</module>
-        <module>rpc-server-8002</module>
-        <module>rpc01</module>
+        <module>rpc-server</module>
     </modules>
     <packaging>pom</packaging>
 

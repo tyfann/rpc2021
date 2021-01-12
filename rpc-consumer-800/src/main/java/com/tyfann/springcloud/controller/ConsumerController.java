@@ -1,8 +1,10 @@
 package com.tyfann.springcloud.controller;
 
+import com.tyfann.springcloud.entities.IProductService;
 import com.tyfann.springcloud.entities.IUserService;
-import com.tyfann.springcloud.entities.User;
+import com.tyfann.springcloud.entities.Product;
 import com.tyfann.springcloud.lb.LoadBalancer;
+import com.tyfann.springcloud.stub.ConsumerStub;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -35,6 +37,42 @@ public class ConsumerController {
     @GetMapping(value = "/consumer/payment/zk")
     public String getUserInfoById() throws Exception {
         //重试策略，每隔1000ms重试一次，总共重试10次
+        connectZk();
+        final String serviceName = "rpc-payment-service";
+        String serviceAddress = discover(serviceName);
+
+        IUserService service = (IUserService) ConsumerStub.getStub(serviceAddress,IUserService.class);
+        String userName = service.findUserById(queryNum);
+        System.out.println("服务调用成功！结果是：  "+userName);
+        return userName;
+    }
+
+    @GetMapping(value = "/consumer/productInfo/zk")
+    public String getProductInfoById() throws Exception {
+        connectZk();
+        final String serviceName = "rpc-payment-service";
+        String serviceAddress = discover(serviceName);
+
+        IProductService service = (IProductService) ConsumerStub.getStub(serviceAddress, IProductService.class);
+        String productInfo = service.findProductInfoById(queryNum);
+        System.out.println("服务调用成功！结果是：  "+productInfo);
+        return productInfo;
+    }
+
+    @GetMapping(value = "/consumer/product/zk")
+    public Product getProductById() throws Exception {
+        connectZk();
+        final String serviceName = "rpc-payment-service";
+        String serviceAddress = discover(serviceName);
+
+        IProductService service = (IProductService) ConsumerStub.getStub(serviceAddress, IProductService.class);
+        Product product = service.findProductById(queryNum);
+        System.out.println("服务调用成功！结果是：  "+product);
+        return product;
+    }
+
+    public void connectZk() {
+
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 10);
         client = CuratorFrameworkFactory.builder()
                 .connectString(IP)   //zookeeper服务器地址
@@ -44,16 +82,6 @@ public class ConsumerController {
                 .build();
 
         client.start();
-
-        final String serviceName = "rpc-payment-service";
-        String serviceAddress = discover(serviceName);
-        String ip = serviceAddress.split("[:]")[0];
-        int port = Integer.parseInt(serviceAddress.split("[:]")[1]);
-
-        IUserService service = ConsumerStub.getStub(ip,port);
-        String userName = service.findUserById(queryNum);
-        System.out.println("服务调用成功！结果是：  "+userName);
-        return userName;
     }
 
     public String discover(String serviceName) throws Exception {
