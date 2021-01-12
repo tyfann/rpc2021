@@ -1,29 +1,27 @@
-package com.tyfann.springcloud;
+package com.tyfann.springcloud.controller;
 
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.imps.CuratorFrameworkImpl;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooDefs;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
  * @author tyfann
- * @date 2021/1/12 10:48 上午
+ * @date 2021/1/12 12:32 下午
  */
 public class CuratorCreate {
-
     CuratorFramework client;
     final String IP = "192.168.1.106:2181";
+    public static final String zkServerPath = "127.0.0.1";
 
-    @Before
-    public void before() {
+
+    public void create(int port) throws Exception {
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 10);
         client = CuratorFrameworkFactory.builder()
                 .connectString(IP)   //zookeeper服务器地址
@@ -34,24 +32,32 @@ public class CuratorCreate {
                 .build();
 
         client.start();
-    }
 
-    @After
-    public void after() {
+        createNode(port);
+
         client.close();
+
     }
 
-    @Test
-    public void create1() throws Exception {
+    public void createNode(int port) throws Exception {
         final Base64.Encoder encoder = Base64.getEncoder();
-        final String text = "127.0.0.1:8002";
-        
+        final String text = zkServerPath+":"+port;
         final byte[] ipByte = text.getBytes(StandardCharsets.UTF_8);
         final String encodeIp = encoder.encodeToString(ipByte);
+        client.checkExists()
+                .forPath("/rpc-payment-service");
         client.create()
                 .withMode(CreateMode.PERSISTENT)
                 .withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE)
                 .forPath("/rpc-payment-service/"+encodeIp,encodeIp.getBytes(StandardCharsets.UTF_8));
-        System.out.println("结束");
+    }
+
+    public void delete(int port) throws Exception {
+        final Base64.Encoder encoder = Base64.getEncoder();
+        final String text = zkServerPath+":"+port;
+        final byte[] ipByte = text.getBytes(StandardCharsets.UTF_8);
+        final String encodeIp = encoder.encodeToString(ipByte);
+        client.delete()
+                .forPath("/rpc-payment-service/"+encodeIp);
     }
 }

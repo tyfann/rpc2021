@@ -1,12 +1,13 @@
 package com.tyfann.springcloud;
 
+import com.tyfann.springcloud.controller.CuratorCreate;
 import com.tyfann.springcloud.entities.IUserService;
-import com.tyfann.springcloud.entities.User;
 import com.tyfann.springcloud.service.IUserServiceImpl01;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -17,13 +18,18 @@ import java.net.Socket;
 public class Server01 {
     private static boolean running = true;
     public static void main(String[] args) throws Exception {
-        ServerSocket server = new ServerSocket(8001);
+        ServerSocket server = new ServerSocket(0,1, InetAddress.getByAddress(new byte[]{127,0,0,1}));
+        int port = server.getLocalPort();
+        CuratorCreate curatorCreate = new CuratorCreate();
+        curatorCreate.create(port);
         while(running){
             Socket client = server.accept();
             process(client);
             client.close();
         }
+        curatorCreate.delete(port);
         server.close();
+
     }
     public static void process(Socket socket) throws Exception {
         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
