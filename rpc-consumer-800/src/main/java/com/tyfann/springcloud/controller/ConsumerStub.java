@@ -23,7 +23,7 @@ public class ConsumerStub {
     static IUserService getStub(String ip, int port) {
         InvocationHandler handler = new InvocationHandler() {
             @Override
-            public String invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 Socket socket = new Socket(ip,port);
 
                 ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
@@ -36,12 +36,11 @@ public class ConsumerStub {
                 oos.flush();
 
                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-                String userName = (String) ois.readObject();
-                System.out.println("Yes!!!!");
+                Object obj = ois.readObject();
 
                 oos.close();
                 socket.close();
-                return userName;
+                return obj;
             }
         };
         Object o = Proxy.newProxyInstance(IUserService.class.getClassLoader(), new Class[]{IUserService.class},handler);

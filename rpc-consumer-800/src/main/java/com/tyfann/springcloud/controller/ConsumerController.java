@@ -65,7 +65,7 @@ public class ConsumerController {
         List<String> nodeNames = new ArrayList<>();
         while (it.hasNext()){
             String s = it.next();
-            System.out.println(new String(decoder.decode(s),StandardCharsets.UTF_8));
+//            System.out.println(new String(decoder.decode(s),StandardCharsets.UTF_8));
             nodeNames.add(new String(decoder.decode(s),StandardCharsets.UTF_8));
         }
 

@@ -36,8 +36,8 @@ public class Server01 {
 
         IUserService service = new IUserServiceImpl01();//服务类型暂时还是写死的，不够灵活
         Method method = service.getClass().getMethod(methodName, parameterTypes);
-        String userName = (String) method.invoke(service, parameters);
-        oos.writeObject(userName);
+        Object Obj = method.invoke(service, parameters);
+        oos.writeObject(Obj);
         oos.flush();
     }
 }
