@@ -10,7 +10,7 @@ import java.util.HashMap;
  * @author tyfann
  * @date 2021/1/17 5:07 下午
  */
-@Target({ElementType.METHOD,ElementType.TYPE,ElementType.FIELD})
+@Target({ElementType.METHOD,ElementType.TYPE,ElementType.FIELD,ElementType.CONSTRUCTOR})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Table {
     String name();

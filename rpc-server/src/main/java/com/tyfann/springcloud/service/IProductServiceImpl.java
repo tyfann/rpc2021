@@ -9,7 +9,7 @@ import com.tyfann.springcloud.entities.Table;
  * @date 2021/1/12 8:44 下午
  */
 
-@Table(name = "IProductService")
+@Table(name = "com.tyfann.springcloud.entities.IProductService")
 public class IProductServiceImpl implements IProductService {
     @Override
     public Product findProductById(Integer id) {

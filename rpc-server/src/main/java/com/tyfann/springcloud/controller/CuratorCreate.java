@@ -35,12 +35,12 @@ public class CuratorCreate {
     final String IP = "192.168.16.103:2181";
     public static final String zkServerPath = "127.0.0.1";
 
-//    private static HashMap<String,Class> registerTable = new HashMap<>();
-//    static {
-//
-//        registerTable.put(IUserService.class.getName(), IUserServiceImpl.class);
-//        registerTable.put(IProductService.class.getName(), IProductServiceImpl.class);
-//    }
+    private static HashMap<String,Class> registerTable = new HashMap<>();
+    static {
+
+        registerTable.put(IUserService.class.getName(), IUserServiceImpl.class);
+        registerTable.put(IProductService.class.getName(), IProductServiceImpl.class);
+    }
 
 
 
@@ -98,27 +98,34 @@ public class CuratorCreate {
         Object[] parameters = (Object[]) ois.readObject();
 
 
+
         Set<Class<?>> typesAnnotatedWith = new Reflections().getTypesAnnotatedWith(Table.class);
 
-
-
-        for (Class clazz : typesAnnotatedWith){
-            Annotation[] annotations = clazz.getAnnotations();
-            for (Annotation annotation : annotations){
-                Table table = (Table) annotation;
-                if (table.name().equals(className)){
-                    System.out.println("!!!!!\n");
-                    Object service = clazz.newInstance();
-                    Method method = service.getClass().getMethod(methodName, parameterTypes);
-                    Object obj = method.invoke(service, parameters);
-                    oos.writeObject(obj);
-                    oos.flush();
-                }
+        for (Class clazz : typesAnnotatedWith) {
+            Table table = (Table) clazz.getAnnotation(Table.class);
+            if (table.name().equals(className)) {
+                Object service = clazz.newInstance();
+                Method method = service.getClass().getMethod(methodName, parameterTypes);
+                Object obj = method.invoke(service, parameters);
+                oos.writeObject(obj);
+                oos.flush();
             }
         }
-//        Object service = registerTable.get(className).newInstance();
-//        Method method = service.getClass().getMethod(methodName, parameterTypes);
-//        Object Obj = method.invoke(service, parameters);
+
+//            Annotation[] annotations = clazz.getAnnotations();
+//            for (Annotation annotation : annotations){
+//                Table table = (Table) annotation;
+//                if (table.name().equals(className)){
+////                    System.out.println("!!!!!\n");
+//                    Object service = clazz.newInstance();
+//                    Method method = service.getClass().getMethod(methodName, parameterTypes);
+//                    Object obj = method.invoke(service, parameters);
+//                    oos.writeObject(obj);
+//                    oos.flush();
+//                }
+//            }
+//        }
+        
     }
 
 }

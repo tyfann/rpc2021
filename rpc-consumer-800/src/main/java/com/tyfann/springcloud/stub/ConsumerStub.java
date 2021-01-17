@@ -14,7 +14,7 @@ import java.net.Socket;
  */
 public class ConsumerStub {
 
-    public static final String INVOKE_URL = "http://rpc-server-payment";
+//    public static final String INVOKE_URL = "http://rpc-server-payment";
 
     public static Object getStub(String serviceAddress,Class c) {
         InvocationHandler handler = new InvocationHandler() {

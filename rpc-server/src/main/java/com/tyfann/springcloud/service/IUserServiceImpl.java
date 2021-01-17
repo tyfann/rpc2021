@@ -9,8 +9,10 @@ import com.tyfann.springcloud.entities.User;
  * @date 2021/1/12 8:41 下午
  */
 
-@Table(name = "IUserService")
+@Table(name = "com.tyfann.springcloud.entities.IUserService")
 public class IUserServiceImpl implements IUserService {
+    public String id = "yes";
+
     @Override
     public String findUserById(Integer id) {
         return "Michael";
