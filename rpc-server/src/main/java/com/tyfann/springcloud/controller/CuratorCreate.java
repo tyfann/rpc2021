@@ -2,6 +2,7 @@ package com.tyfann.springcloud.controller;
 
 import com.tyfann.springcloud.entities.IProductService;
 import com.tyfann.springcloud.entities.IUserService;
+import com.tyfann.springcloud.entities.Table;
 import com.tyfann.springcloud.service.IProductServiceImpl;
 import com.tyfann.springcloud.service.IUserServiceImpl;
 import lombok.SneakyThrows;
@@ -11,15 +12,18 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooDefs;
+import org.reflections.Reflections;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * @author tyfann
@@ -28,14 +32,15 @@ import java.util.HashMap;
 public class CuratorCreate {
     private static boolean running = true;
     CuratorFramework client;
-    final String IP = "192.168.1.106:2181";
+    final String IP = "192.168.16.103:2181";
     public static final String zkServerPath = "127.0.0.1";
 
-    private static HashMap<String,Class> registerTable = new HashMap<>();
-    static {
-        registerTable.put(IUserService.class.getName(), IUserServiceImpl.class);
-        registerTable.put(IProductService.class.getName(), IProductServiceImpl.class);
-    }
+//    private static HashMap<String,Class> registerTable = new HashMap<>();
+//    static {
+//
+//        registerTable.put(IUserService.class.getName(), IUserServiceImpl.class);
+//        registerTable.put(IProductService.class.getName(), IProductServiceImpl.class);
+//    }
 
 
 
@@ -93,11 +98,27 @@ public class CuratorCreate {
         Object[] parameters = (Object[]) ois.readObject();
 
 
-        Object service = registerTable.get(className).newInstance();
-        Method method = service.getClass().getMethod(methodName, parameterTypes);
-        Object Obj = method.invoke(service, parameters);
-        oos.writeObject(Obj);
-        oos.flush();
+        Set<Class<?>> typesAnnotatedWith = new Reflections().getTypesAnnotatedWith(Table.class);
+
+
+
+        for (Class clazz : typesAnnotatedWith){
+            Annotation[] annotations = clazz.getAnnotations();
+            for (Annotation annotation : annotations){
+                Table table = (Table) annotation;
+                if (table.name().equals(className)){
+                    System.out.println("!!!!!\n");
+                    Object service = clazz.newInstance();
+                    Method method = service.getClass().getMethod(methodName, parameterTypes);
+                    Object obj = method.invoke(service, parameters);
+                    oos.writeObject(obj);
+                    oos.flush();
+                }
+            }
+        }
+//        Object service = registerTable.get(className).newInstance();
+//        Method method = service.getClass().getMethod(methodName, parameterTypes);
+//        Object Obj = method.invoke(service, parameters);
     }
 
 }

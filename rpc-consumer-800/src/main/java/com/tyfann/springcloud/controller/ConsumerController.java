@@ -27,7 +27,7 @@ import java.util.List;
 public class ConsumerController {
 
     CuratorFramework client;
-    final String IP = "192.168.1.106:2181";
+    final String IP = "192.168.16.103:2181";
     final String Path = "/services";
     int queryNum = 123;
 
